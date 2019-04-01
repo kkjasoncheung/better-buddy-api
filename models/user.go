@@ -8,21 +8,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User struct
+// User struct has one Companion.
 type User struct {
 	gorm.Model
-	FirstName       string `json:"first_name"`
-	LastName        string `json:"last_name"`
-	Username        string `json:"username"`
-	PasswordDigest  string `json:"password_digest"`
-	Email           string `json:"email"`
-	BirthDay        string `json:"birthday"`
-	Gender          string `json:"gender"`
-	DisplayPhotoURL string `json:"display_photo_url"`
+	FirstName       string    `json:"first_name"`
+	LastName        string    `json:"last_name"`
+	Username        string    `json:"username"`
+	PasswordDigest  string    `json:"password_digest"`
+	Email           string    `json:"email"`
+	BirthDay        string    `json:"birthday"`
+	Gender          string    `json:"gender"`
+	DisplayPhotoURL string    `json:"display_photo_url"`
+	CompanionID     uint      `json:"companionID"`
+	Companion       Companion `json:"Companion"`
 }
 
 // CreateUser creates a new user and stores it in the database.
-func (u User) CreateUser(firstName, lastName, username, password, email, birthday, gender, displayPhotoURL string) {
+func (u User) CreateUser(firstName, lastName, username, password, email, birthday, gender, displayPhotoURL string) User {
 	db := db.GetDb()
 
 	user := User{
@@ -36,13 +38,15 @@ func (u User) CreateUser(firstName, lastName, username, password, email, birthda
 		DisplayPhotoURL: displayPhotoURL,
 	}
 	db.Create(&user)
+
+	return user
 }
 
 // GetAllUsers returns all users.
 func (u User) GetAllUsers() []User {
 	users := []User{}
-	// Query the DB
-	// db := db.GetDb()
+	db := db.GetDb()
+	db.Find(&users)
 	return users
 }
 
@@ -94,6 +98,23 @@ func (u User) DeleteByID(id int) *User {
 	user = user.FindByID(id)
 	db.Delete(&user)
 	return user
+}
+
+// GetCompanion returns the companion associated with this user.
+func (u User) GetCompanion() *Companion {
+	db := db.GetDb()
+	companion := new(Companion)
+	db.First(&companion, u.CompanionID)
+	return companion
+}
+
+// ChangeCompanion changes the companion for the user.
+func (u *User) ChangeCompanion(newID uint) {
+	db := db.GetDb()
+	newCompanion := new(Companion)
+	if err := db.First(&newCompanion, newID).Error; err != nil {
+		log.Fatal(err)
+	}
 }
 
 // HashPassword hashes the password passed in with bcrypt.
