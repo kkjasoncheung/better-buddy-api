@@ -8,12 +8,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// User struct
 type User struct {
 	gorm.Model
 	FirstName       string `json:"first_name"`
 	LastName        string `json:"last_name"`
 	Username        string `json:"username"`
-	PasswordDigest  string
+	PasswordDigest  string `json:"password_digest"`
 	Email           string `json:"email"`
 	BirthDay        string `json:"birthday"`
 	Gender          string `json:"gender"`
@@ -68,6 +69,9 @@ func (u User) UpdateByID(id int, fields map[string]string) *User {
 			user.LastName = value
 		case "Username":
 			user.Username = value
+		case "Password":
+			newPassword := HashPassword(value)
+			user.PasswordDigest = newPassword
 		case "Email":
 			user.Email = value
 		case "BirthDay":
