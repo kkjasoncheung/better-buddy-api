@@ -19,7 +19,6 @@ type User struct {
 	BirthDay        string    `json:"birthday"`
 	Gender          string    `json:"gender"`
 	DisplayPhotoURL string    `json:"display_photo_url"`
-	CompanionID     uint      `json:"companionID"`
 	Companion       Companion `json:"Companion"`
 }
 
@@ -104,17 +103,22 @@ func (u User) DeleteByID(id int) *User {
 func (u User) GetCompanion() *Companion {
 	db := db.GetDb()
 	companion := new(Companion)
-	db.First(&companion, u.CompanionID)
+	db.Model(&u).Related(&companion, "Companion")
 	return companion
 }
 
 // ChangeCompanion changes the companion for the user.
-func (u *User) ChangeCompanion(newID uint) {
+func (u *User) ChangeCompanion(newID uint) (*Companion, error) {
 	db := db.GetDb()
 	newCompanion := new(Companion)
 	if err := db.First(&newCompanion, newID).Error; err != nil {
 		log.Fatal(err)
+		return nil, err
 	}
+
+	newCompanion.UserID = u.ID
+	db.Save(&newCompanion)
+	return newCompanion, nil
 }
 
 // HashPassword hashes the password passed in with bcrypt.
