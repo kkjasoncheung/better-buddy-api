@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/kkjasoncheung/better-buddy-api/errors"
 
@@ -89,6 +90,16 @@ func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 			user.Gender = value
 		case "DisplayPhotoUrl":
 			user.DisplayPhotoURL = value
+		case "CompanionID":
+			if newVal, err := strconv.ParseUint(value, 10, 32); err == nil {
+				_, err := user.ChangeCompanion(uint(newVal))
+				if err != nil {
+					log.Println(err)
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
 		}
 	}
 	db.Save(&user)
@@ -122,7 +133,7 @@ func (u User) ChangeCompanionByID(userID uint, newID uint) (*User, error) {
 
 	newCompanion := new(Companion)
 	if err := db.First(&newCompanion, newID).Error; err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 
@@ -138,12 +149,14 @@ func (u *User) ChangeCompanion(newID uint) (*Companion, error) {
 	db := db.GetDb()
 	newCompanion := new(Companion)
 	if err := db.First(&newCompanion, newID).Error; err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 
 	newCompanion.UserID = u.ID
+	u.Companion = *newCompanion
 	db.Save(&newCompanion)
+	db.Save(&u)
 	return newCompanion, nil
 }
 

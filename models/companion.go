@@ -54,8 +54,6 @@ func (c Companion) FindByID(id uint) *Companion {
 
 // UpdateByID updates the companion by id with the given key value pairs in fields.
 func (c Companion) UpdateByID(id uint, fields map[string]string) (*Companion, error) {
-	db := db.GetDb()
-
 	companion := new(Companion)
 	companion = companion.FindByID(id)
 
@@ -64,33 +62,33 @@ func (c Companion) UpdateByID(id uint, fields map[string]string) (*Companion, er
 		case "Name":
 			companion.Name = value
 		case "Hunger":
-			if f, err := strconv.ParseFloat(value, 32); err == nil {
-				companion.Hunger = float32(f)
+			if newVal, err := strconv.ParseFloat(value, 32); err == nil {
+				companion.Hunger = float32(newVal)
 			} else {
 				return nil, err
 			}
 
 		case "Tiredness":
-			if f, err := strconv.ParseFloat(value, 32); err == nil {
-				companion.Tiredness = float32(f)
+			if newVal, err := strconv.ParseFloat(value, 32); err == nil {
+				companion.Tiredness = float32(newVal)
 			} else {
 				return nil, err
 			}
 		case "Happiness":
-			if f, err := strconv.ParseFloat(value, 32); err == nil {
-				companion.Happiness = float32(f)
+			if newVal, err := strconv.ParseFloat(value, 32); err == nil {
+				companion.Happiness = float32(newVal)
 			} else {
 				return nil, err
 			}
 		case "IntellectPotential":
-			if f, err := strconv.ParseFloat(value, 32); err == nil {
-				companion.IntellectPotential = float32(f)
+			if newVal, err := strconv.ParseFloat(value, 32); err == nil {
+				companion.IntellectPotential = float32(newVal)
 			} else {
 				return nil, err
 			}
 		case "UserID":
-			if f, err := strconv.ParseUint(value, 10, 32); err == nil {
-				companion.UserID = uint(f)
+			if newVal, err := strconv.ParseUint(value, 10, 32); err == nil {
+				companion.UserID = uint(newVal)
 			} else {
 				return nil, err
 			}
@@ -108,16 +106,16 @@ func (c Companion) GetUser() *User {
 	return user
 }
 
-// ChangeUserByID changes the user id for a companion given companionID.
+// ChangeUserByID changes the user id to newID for a companion given companionID.
 func (c Companion) ChangeUserByID(companionID uint, newID uint) (*Companion, error) {
 	db := db.GetDb()
 
-	newUser := new(User)
-	newUser = newUser.FindByID(newID)
+	user := new(User)
+	newUser := user.FindByID(newID)
 
 	companion := new(Companion)
 	if err := db.First(&newUser, newID).Error; err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		return nil, err
 	}
 
