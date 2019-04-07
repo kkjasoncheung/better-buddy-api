@@ -3,6 +3,8 @@ package models
 import (
 	"log"
 
+	"github.com/kkjasoncheung/better-buddy-api/errors"
+
 	"github.com/jinzhu/gorm"
 	"github.com/kkjasoncheung/better-buddy-api/db"
 	"golang.org/x/crypto/bcrypt"
@@ -58,7 +60,7 @@ func (u User) FindByID(id int) *User {
 }
 
 // UpdateByID updates a user's attributes by id.
-func (u User) UpdateByID(id int, fields map[string]string) *User {
+func (u User) UpdateByID(id int, fields map[string]string) (*User, error) {
 	db := db.GetDb()
 
 	user := new(User)
@@ -73,6 +75,10 @@ func (u User) UpdateByID(id int, fields map[string]string) *User {
 		case "Username":
 			user.Username = value
 		case "Password":
+			// Verify if current user has correct pwd
+			if HashPassword(fields["OldPassword"]) != user.PasswordDigest {
+				return nil, errors.NewInvalidPasswordError()
+			}
 			newPassword := HashPassword(value)
 			user.PasswordDigest = newPassword
 		case "Email":
@@ -87,7 +93,7 @@ func (u User) UpdateByID(id int, fields map[string]string) *User {
 	}
 	db.Save(&user)
 
-	return user
+	return user, nil
 }
 
 // DeleteByID deletes a user by id.
