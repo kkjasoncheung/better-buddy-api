@@ -98,6 +98,15 @@ func (c Companion) UpdateByID(id uint, fields map[string]string) (*Companion, er
 	return companion, nil
 }
 
+// GetUserByCompanionID returns the user associated with the companion id.
+func (c Companion) GetUserByCompanionID(id uint) *User {
+	db := db.GetDb()
+	companion := c.FindByID(id)
+	user := new(User)
+	db.First(&user, companion.UserID)
+	return user
+}
+
 // GetUser returns the user associated with this companion.
 func (c Companion) GetUser() *User {
 	db := db.GetDb()
