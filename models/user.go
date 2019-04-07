@@ -52,7 +52,7 @@ func (u User) GetAllUsers() []User {
 }
 
 // FindByID finds a user by id.
-func (u User) FindByID(id int) *User {
+func (u User) FindByID(id uint) *User {
 	db := db.GetDb()
 	user := new(User)
 	db.First(&user, id)
@@ -60,7 +60,7 @@ func (u User) FindByID(id int) *User {
 }
 
 // UpdateByID updates a user's attributes by id.
-func (u User) UpdateByID(id int, fields map[string]string) (*User, error) {
+func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 	db := db.GetDb()
 
 	user := new(User)
@@ -97,7 +97,7 @@ func (u User) UpdateByID(id int, fields map[string]string) (*User, error) {
 }
 
 // DeleteByID deletes a user by id.
-func (u User) DeleteByID(id int) *User {
+func (u User) DeleteByID(id uint) *User {
 	db := db.GetDb()
 	user := new(User)
 	user = user.FindByID(id)
@@ -111,6 +111,26 @@ func (u User) GetCompanion() *Companion {
 	companion := new(Companion)
 	db.Model(&u).Related(&companion, "Companion")
 	return companion
+}
+
+// ChangeCompanionByID changes the companion for the user based on userID.
+func (u User) ChangeCompanionByID(userID uint, newID uint) (*User, error) {
+	db := db.GetDb()
+
+	user := new(User)
+	user = user.FindByID(userID)
+
+	newCompanion := new(Companion)
+	if err := db.First(&newCompanion, newID).Error; err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	newCompanion.UserID = userID
+	user.Companion = *newCompanion
+	db.Save(&newCompanion)
+	db.Save(&user)
+	return user, nil
 }
 
 // ChangeCompanion changes the companion for the user.
