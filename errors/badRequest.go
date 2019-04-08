@@ -1,6 +1,6 @@
 package errors
 
-// BadRequestError is thrown when a bad request is sent.
+// badRequestError is thrown when a bad request is sent.
 // Use the constructor, NewBadRequestError() to create this error.
 type badRequestError struct {
 	baseError
@@ -10,7 +10,7 @@ type badRequestError struct {
 func NewBadRequestError() badRequestError {
 	err := badRequestError{
 		baseError{
-			Message: "Bad Request.",
+			Message: BadRequestErrMsg,
 			Code:    BadRequestErrCode,
 		}}
 	return err

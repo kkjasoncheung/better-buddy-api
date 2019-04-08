@@ -54,19 +54,26 @@ func (u User) GetAllUsers() []User {
 	return users
 }
 
-// FindByID finds a user by id.
-func (u User) FindByID(id uint) *User {
+// FindByID finds a user by id. Returns nil if user not found.
+func (u User) FindByID(id uint) (*User, error) {
 	db := db.GetDb()
 	user := new(User)
 	db.First(&user, id)
-	// TODO: Throw error if user not found.
-	return user
+	if user == nil {
+		err := errors.NewUserNotFoundError()
+		log.Println(err)
+		return nil, err
+	}
+	return user, nil
 }
 
 // UpdateByID updates a user's attributes by id.
 func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 	db := db.GetDb()
-	user := u.FindByID(id)
+	user, err := u.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
 
 	for key, value := range fields {
 		switch key {
@@ -109,12 +116,14 @@ func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 }
 
 // DeleteByID deletes a user by id.
-func (u User) DeleteByID(id uint) *User {
+func (u User) DeleteByID(id uint) (*User, error) {
 	db := db.GetDb()
-	user := new(User)
-	user = user.FindByID(id)
+	user, err := u.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
 	db.Delete(&user)
-	return user
+	return user, nil
 }
 
 // GetCompanion returns the companion associated with this user.
@@ -128,10 +137,10 @@ func (u User) GetCompanion() *Companion {
 // ChangeCompanionByID changes the companion for the user based on userID.
 func (u User) ChangeCompanionByID(userID uint, newID uint) (*User, error) {
 	db := db.GetDb()
-
-	user := new(User)
-	user = user.FindByID(userID)
-
+	user, err := u.FindByID(userID)
+	if err != nil {
+		return nil, err
+	}
 	newCompanion := new(Companion)
 	if err := db.First(&newCompanion, newID).Error; err != nil {
 		log.Println(err)

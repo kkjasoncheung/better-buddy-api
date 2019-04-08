@@ -120,8 +120,10 @@ func (c Companion) ChangeUserByID(companionID uint, newID uint) (*Companion, err
 	db := db.GetDb()
 
 	user := new(User)
-	newUser := user.FindByID(newID)
-
+	newUser, err := user.FindByID(newID)
+	if err != nil {
+		return nil, err
+	}
 	companion := new(Companion)
 	if err := db.First(&newUser, newID).Error; err != nil {
 		log.Println(err)
