@@ -66,4 +66,12 @@ func (u UserController) Create(c *gin.Context) {
 	}
 }
 
-// TODO: Implement PATCH user/:id, DELETE user/:id
+// Update handles PATCH /user/:id. Updates user by ID.
+func (u UserController) Update(c *gin.Context) {
+	// TODO: Implement method.
+}
+
+// Delete handles DELETE /user/:id. Deletes user by ID.
+func (u UserController) Delete(c *gin.Context) {
+	// TODO: Implement method.
+}

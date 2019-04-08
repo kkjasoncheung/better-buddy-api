@@ -17,6 +17,8 @@ func NewRouter() *gin.Engine {
 			userGroup.GET("/", userController.Retrieve)
 			userGroup.GET("/:id", userController.RetrieveByID)
 			userGroup.POST("/", userController.Create)
+			userGroup.PATCH("/:id", userController.Update)
+			userGroup.DELETE("/:id", userController.Delete)
 		}
 	}
 
