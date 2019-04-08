@@ -30,8 +30,8 @@ func (u User) CreateUser(fields map[string]string) (User, error) {
 	db := db.GetDb()
 
 	user := User{
-		FirstName:       fields["firstName"],
-		LastName:        fields["lastName"],
+		FirstName:       fields["first_name"],
+		LastName:        fields["last_name"],
 		Username:        fields["username"],
 		PasswordDigest:  HashPassword(fields["password"]),
 		Email:           fields["email"],
