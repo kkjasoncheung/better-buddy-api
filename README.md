@@ -13,11 +13,14 @@ Run the app
 ```
 $ go run main.go
 ```
+
 Navigate to `localhost:8080`
+
 Available endpoints so far (on `create_user_controller` branch):
 - GET user
 - GET user/:id
 - POST user
+
 ... Others are currently being worked on.
 
 _*Reminder to create Swagger to document endpoints.*_
