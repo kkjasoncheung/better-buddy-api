@@ -20,6 +20,8 @@ Available endpoints so far (on `create_user_controller` branch):
 - GET user
 - GET user/:id
 - POST user
+- PATCH user/:id
+- DELETE user/:id
 
 ... Others are currently being worked on.
 
