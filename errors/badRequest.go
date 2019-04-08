@@ -1,6 +1,7 @@
 package errors
 
-// invalidPasswordError is thrown when a user enters an incorrect password.
+// BadRequestError is thrown when a bad request is sent.
+// Use the constructor, NewBadRequestError() to create this error.
 type badRequestError struct {
 	baseError
 }
@@ -10,7 +11,7 @@ func NewBadRequestError() badRequestError {
 	err := badRequestError{
 		baseError{
 			Message: "Bad Request.",
-			Code:    BadRequestError,
+			Code:    BadRequestErrCode,
 		}}
 	return err
 }

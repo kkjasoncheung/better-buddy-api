@@ -1,6 +1,7 @@
 package errors
 
-// invalidPasswordError is thrown when a user enters an incorrect password.
+// InvalidPasswordError is thrown when a user enters an incorrect password.
+// Use the constructor, NewInvalidPasswordError() to create this error.
 type invalidPasswordError struct {
 	baseError
 }
@@ -10,7 +11,7 @@ func NewInvalidPasswordError() invalidPasswordError {
 	err := invalidPasswordError{
 		baseError{
 			Message: "Invalid Password Entered. Please try again.",
-			Code:    InvalidPasswordError,
+			Code:    InvalidPasswordErrCode,
 		}}
 	return err
 }

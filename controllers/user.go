@@ -47,15 +47,7 @@ func (u UserController) RetrieveByID(c *gin.Context) {
 
 // Create handles POST /user. Creates a new user.
 func (u UserController) Create(c *gin.Context) {
-	fields := make(map[string]string)
-	fields["first_name"] = c.PostForm("first_name")
-	fields["last_name"] = c.PostForm("last_name")
-	fields["username"] = c.PostForm("username")
-	fields["password"] = c.PostForm("password")
-	fields["email"] = c.PostForm("email")
-	fields["birthday"] = c.PostForm("birthday")
-	fields["gender"] = c.PostForm("gender")
-	fields["display_photo_url"] = c.PostForm("display_photo_url")
+	fields := defineFieldsMap(c)
 	fmt.Println(fields)
 	if user, err := userModel.CreateUser(fields); err == nil {
 		c.JSON(http.StatusCreated, gin.H{"user": user})
@@ -68,7 +60,25 @@ func (u UserController) Create(c *gin.Context) {
 
 // Update handles PATCH /user/:id. Updates user by ID.
 func (u UserController) Update(c *gin.Context) {
-	// TODO: Implement method.
+	if c.Param("id") == "" {
+		err := errors.NewBadRequestError()
+		c.JSON(http.StatusBadRequest, gin.H{"code": err.Code, "message": err.Message})
+		c.Abort()
+		return
+	}
+	newVal, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err == nil {
+		fields := defineFieldsMap(c)
+		user, err := userModel.UpdateByID(uint(newVal), fields)
+		if err == nil {
+			c.JSON(http.StatusOK, gin.H{"user": user})
+			return
+		}
+	}
+	log.Println(err)
+	c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
+	c.Abort()
+	return
 }
 
 // Delete handles DELETE /user/:id. Deletes user by ID.
@@ -84,4 +94,18 @@ func (u UserController) Delete(c *gin.Context) {
 		return
 	}
 
+}
+
+// defineFieldsMap returns a map[string]string with user fields given a context.
+func defineFieldsMap(c *gin.Context) map[string]string {
+	fields := make(map[string]string)
+	fields["first_name"] = c.PostForm("first_name")
+	fields["last_name"] = c.PostForm("last_name")
+	fields["username"] = c.PostForm("username")
+	fields["password"] = c.PostForm("password")
+	fields["email"] = c.PostForm("email")
+	fields["birthday"] = c.PostForm("birthday")
+	fields["gender"] = c.PostForm("gender")
+	fields["display_photo_url"] = c.PostForm("display_photo_url")
+	return fields
 }

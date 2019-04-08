@@ -1,5 +1,7 @@
 package errors
 
-// InvalidPasswordError is the error code corresponding to an invalid password.
-const InvalidPasswordError = "INVALID_PASSWORD_ERROR"
-const BadRequestError = "BAD_REQUEST_ERROR"
+// InvalidPasswordErrCode is the error code for invalid passwords.
+const InvalidPasswordErrCode = "INVALID_PASSWORD_ERROR"
+
+// BadRequestErrCode is the error code for bad requests.
+const BadRequestErrCode = "BAD_REQUEST_ERROR"

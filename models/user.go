@@ -71,28 +71,28 @@ func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 
 	for key, value := range fields {
 		switch key {
-		case "FirstName":
+		case "first_name":
 			user.FirstName = value
-		case "LastName":
+		case "last_name":
 			user.LastName = value
-		case "Username":
+		case "username":
 			user.Username = value
-		case "Password":
+		case "new_password":
 			// Verify if current user has correct pwd
-			if HashPassword(fields["OldPassword"]) != user.PasswordDigest {
+			if HashPassword(fields["old_password"]) != user.PasswordDigest {
 				return nil, errors.NewInvalidPasswordError()
 			}
 			newPassword := HashPassword(value)
 			user.PasswordDigest = newPassword
-		case "Email":
+		case "email":
 			user.Email = value
-		case "BirthDay":
+		case "birthday":
 			user.BirthDay = value
-		case "Gender":
+		case "gender":
 			user.Gender = value
-		case "DisplayPhotoUrl":
+		case "display_photo_url":
 			user.DisplayPhotoURL = value
-		case "CompanionID":
+		case "companion_id":
 			if newVal, err := strconv.ParseUint(value, 10, 32); err == nil {
 				_, err := user.ChangeCompanion(uint(newVal))
 				if err != nil {
