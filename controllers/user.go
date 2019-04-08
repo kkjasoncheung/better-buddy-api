@@ -99,13 +99,30 @@ func (u UserController) Delete(c *gin.Context) {
 // defineFieldsMap returns a map[string]string with user fields given a context.
 func defineFieldsMap(c *gin.Context) map[string]string {
 	fields := make(map[string]string)
-	fields["first_name"] = c.PostForm("first_name")
-	fields["last_name"] = c.PostForm("last_name")
-	fields["username"] = c.PostForm("username")
-	fields["password"] = c.PostForm("password")
-	fields["email"] = c.PostForm("email")
-	fields["birthday"] = c.PostForm("birthday")
-	fields["gender"] = c.PostForm("gender")
-	fields["display_photo_url"] = c.PostForm("display_photo_url")
+	if c.PostForm("first_name") != "" {
+		fields["first_name"] = c.PostForm("first_name")
+	}
+	if c.PostForm("last_name") != "" {
+		fields["last_name"] = c.PostForm("last_name")
+	}
+	if c.PostForm("username") != "" {
+		fields["username"] = c.PostForm("username")
+	}
+	if c.PostForm("password") != "" {
+		fields["password"] = c.PostForm("password")
+	}
+	if c.PostForm("email") != "" {
+		fields["email"] = c.PostForm("email")
+	}
+	if c.PostForm("birthday") != "" {
+		fields["birthday"] = c.PostForm("birthday")
+	}
+	if c.PostForm("gender") != "" {
+		fields["gender"] = c.PostForm("gender")
+	}
+	if c.PostForm("display_photo_url") != "" {
+		fields["display_photo_url"] = c.PostForm("display_photo_url")
+	}
+
 	return fields
 }

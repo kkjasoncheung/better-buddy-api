@@ -59,15 +59,14 @@ func (u User) FindByID(id uint) *User {
 	db := db.GetDb()
 	user := new(User)
 	db.First(&user, id)
+	// TODO: Throw error if user not found.
 	return user
 }
 
 // UpdateByID updates a user's attributes by id.
 func (u User) UpdateByID(id uint, fields map[string]string) (*User, error) {
 	db := db.GetDb()
-
-	user := new(User)
-	user = user.FindByID(id)
+	user := u.FindByID(id)
 
 	for key, value := range fields {
 		switch key {
