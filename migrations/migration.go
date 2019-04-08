@@ -12,5 +12,5 @@ func MigrateSchema(db *gorm.DB) {
 	db.Model(models.User{}).AddIndex("idx_last_name", "last_name")
 
 	db.AutoMigrate(models.Companion{})
-	db.Model(models.User{}).AddIndex("idx_name", "name")
+	db.Model(models.Companion{}).AddIndex("idx_name", "name")
 }
