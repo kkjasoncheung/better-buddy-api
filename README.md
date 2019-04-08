@@ -29,4 +29,4 @@ _*Reminder to create Swagger to document endpoints.*_
 
 ## Testing
 ### Integration tests
-Integration tests for the API are written in Postman and can be found [here](https://www.getpostman.com/collections/3ac335ffc3557a389945).
+Integration tests for the API are written in Postman and can be found [here](https://www.getpostman.com/collections/3ac335ffc3557a389945) in JSON format. This collection of tests can be imported into the Postman Application. See [here](https://learning.getpostman.com/docs/postman/collections/data_formats/) for more information on importing data to Postman.
