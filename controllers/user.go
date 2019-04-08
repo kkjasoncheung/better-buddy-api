@@ -1,10 +1,13 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kkjasoncheung/better-buddy-api/errors"
 	"github.com/kkjasoncheung/better-buddy-api/models"
 )
 
@@ -29,14 +32,38 @@ func (u UserController) RetrieveByID(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"user": user})
 			return
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "Error to retrieve user", "error": err})
+			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
 			c.Abort()
 			return
 		}
 	}
-	c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+	err := errors.NewBadRequestError()
+	log.Println(err)
+	c.JSON(http.StatusBadRequest, gin.H{"code": err.Code, "message": err.Message, "error": err})
 	c.Abort()
 	return
 }
 
-// TODO: Implement PATCH user/:id, POST user, DELETE user/:id
+// Create handles POST /user. Creates a new user.
+func (u UserController) Create(c *gin.Context) {
+	fields := make(map[string]string)
+	fields["first_name"] = c.PostForm("first_name")
+	fields["last_name"] = c.PostForm("last_name")
+	fields["username"] = c.PostForm("username")
+	fields["password"] = c.PostForm("password")
+	fields["email"] = c.PostForm("email")
+	fields["birthday"] = c.PostForm("birthday")
+	fields["gender"] = c.PostForm("gender")
+	fields["display_photo_url"] = c.PostForm("display_photo_url")
+	fmt.Println(fields)
+	if user, err := userModel.CreateUser(fields); err == nil {
+		c.JSON(http.StatusCreated, gin.H{"user": user})
+	} else {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error creating user", "error": err})
+		c.Abort()
+	}
+}
+
+// TODO: Implement PATCH user/:id, DELETE user/:id

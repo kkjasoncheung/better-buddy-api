@@ -14,34 +14,36 @@ import (
 // User struct has one Companion.
 type User struct {
 	gorm.Model
-	FirstName       string    `json:"first_name"`
-	LastName        string    `json:"last_name"`
-	Username        string    `json:"username"`
-	PasswordDigest  string    `json:"password_digest"`
-	Email           string    `json:"email"`
-	BirthDay        string    `json:"birthday"`
-	Gender          string    `json:"gender"`
-	DisplayPhotoURL string    `json:"display_photo_url"`
+	FirstName       string `json:"first_name"`
+	LastName        string `json:"last_name"`
+	Username        string `json:"username"`
+	Email           string `json:"email"`
+	BirthDay        string `json:"birthday"`
+	Gender          string `json:"gender"`
+	DisplayPhotoURL string `json:"display_photo_url"`
+	PasswordDigest  string
 	Companion       Companion `json:"Companion"`
 }
 
 // CreateUser creates a new user and stores it in the database.
-func (u User) CreateUser(firstName, lastName, username, password, email, birthday, gender, displayPhotoURL string) User {
+func (u User) CreateUser(fields map[string]string) (User, error) {
 	db := db.GetDb()
 
 	user := User{
-		FirstName:       firstName,
-		LastName:        lastName,
-		Username:        username,
-		PasswordDigest:  HashPassword(password),
-		Email:           email,
-		BirthDay:        birthday,
-		Gender:          gender,
-		DisplayPhotoURL: displayPhotoURL,
+		FirstName:       fields["firstName"],
+		LastName:        fields["lastName"],
+		Username:        fields["username"],
+		PasswordDigest:  HashPassword(fields["password"]),
+		Email:           fields["email"],
+		BirthDay:        fields["birthday"],
+		Gender:          fields["gender"],
+		DisplayPhotoURL: fields["display_photo_url"],
 	}
-	db.Create(&user)
-
-	return user
+	if err := db.Create(&user).Error; err != nil {
+		log.Println(err)
+		return User{}, err
+	}
+	return user, nil
 }
 
 // GetAllUsers returns all users.
