@@ -73,5 +73,15 @@ func (u UserController) Update(c *gin.Context) {
 
 // Delete handles DELETE /user/:id. Deletes user by ID.
 func (u UserController) Delete(c *gin.Context) {
-	// TODO: Implement method.
+	if newVal, err := strconv.ParseUint(c.Param("id"), 10, 32); err == nil {
+		user := userModel.DeleteByID(uint(newVal))
+		c.JSON(http.StatusOK, gin.H{"user": user})
+		return
+	} else {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
+		c.Abort()
+		return
+	}
+
 }
