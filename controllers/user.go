@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/kkjasoncheung/better-buddy-api/errors"
+	"github.com/kkjasoncheung/better-buddy-api/helpers"
 	"github.com/kkjasoncheung/better-buddy-api/models"
 )
 
@@ -27,26 +28,21 @@ func (u UserController) Retrieve(c *gin.Context) {
 func (u UserController) RetrieveByID(c *gin.Context) {
 	if c.Param("id") != "" {
 		// Find the user and return
-		if newVal, err := strconv.ParseUint(c.Param("id"), 10, 32); err == nil {
-			user, err := userModel.FindByID(uint(newVal))
-			if err != nil {
-				if err.Error() == errors.UserNotFoundErrMsg {
-					c.JSON(http.StatusNotFound, gin.H{"code": errors.UserNotFoundErrCode, "message": err.Error(), "error": err})
-				}
-			}
-			c.JSON(http.StatusOK, gin.H{"user": user})
-			return
-		} else {
-			log.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
-			c.Abort()
+		newVal, err := strconv.ParseUint(c.Param("id"), 10, 32)
+		if err != nil {
+			helpers.HandleRetrievingUserError(c, err)
 			return
 		}
+		user, err := userModel.FindByID(uint(newVal))
+		if err != nil {
+			if err.Error() == errors.UserNotFoundErrMsg {
+				c.JSON(http.StatusNotFound, gin.H{"code": errors.UserNotFoundErrCode, "message": err.Error(), "error": err})
+			}
+		}
+		c.JSON(http.StatusOK, gin.H{"user": user})
+		return
 	}
-	err := errors.NewBadRequestError()
-	log.Println(err)
-	c.JSON(http.StatusBadRequest, gin.H{"code": err.Code, "message": err.Message, "error": err})
-	c.Abort()
+	helpers.HandleBadRequestError(c)
 	return
 }
 
@@ -66,48 +62,42 @@ func (u UserController) Create(c *gin.Context) {
 // Update handles PATCH /user/:id. Updates user by ID.
 func (u UserController) Update(c *gin.Context) {
 	if c.Param("id") == "" {
-		err := errors.NewBadRequestError()
-		c.JSON(http.StatusBadRequest, gin.H{"code": err.Code, "message": err.Message})
-		c.Abort()
+		helpers.HandleBadRequestError(c)
 		return
 	}
 	newVal, err := strconv.ParseUint(c.Param("id"), 10, 32)
-	if err == nil {
-		fields := defineFieldsMap(c)
-		user, err := userModel.UpdateByID(uint(newVal), fields)
-		if err == nil {
-			c.JSON(http.StatusOK, gin.H{"user": user})
-			return
+	if err != nil {
+		log.Println(err)
+		if err.Error() == errors.UserNotFoundErrMsg {
+			c.JSON(http.StatusNotFound, gin.H{"code": errors.UserNotFoundErrCode, "message": err.Error(), "error": err})
 		}
+		return
 	}
-	log.Println(err)
-	if err.Error() == errors.UserNotFoundErrMsg {
-		c.JSON(http.StatusNotFound, gin.H{"code": errors.UserNotFoundErrCode, "message": err.Error(), "error": err})
+	fields := defineFieldsMap(c)
+	user, err := userModel.UpdateByID(uint(newVal), fields)
+	if err != nil {
+		helpers.HandleRetrievingUserError(c, err)
+		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
-	c.Abort()
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
 	return
 }
 
 // Delete handles DELETE /user/:id. Deletes user by ID.
 func (u UserController) Delete(c *gin.Context) {
 	user := new(models.User)
-	if newVal, err := strconv.ParseUint(c.Param("id"), 10, 32); err == nil {
-		user, err := userModel.DeleteByID(uint(newVal))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
-			c.Abort()
-			return
-		}
-	} else {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"code": nil, "message": "Error to retrieve user", "error": err})
-		c.Abort()
+	newVal, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		helpers.HandleRetrievingUserError(c, err)
+		return
+	}
+	user, err = userModel.DeleteByID(uint(newVal))
+	if err != nil {
+		helpers.HandleRetrievingUserError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"user": user})
-	return
-
 }
 
 // defineFieldsMap returns a map[string]string with user fields given a context.
